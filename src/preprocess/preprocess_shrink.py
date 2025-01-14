@@ -2,7 +2,7 @@ import pandas as pd
 from collections import Counter
 
 #Leer el dataset
-df = pd.read_csv('./edited_rating.csv')
+df = pd.read_csv('./data/edited_rating.csv')
 print("original dataframe size", len(df))
 
 N = df.userId.max() + 1
@@ -38,4 +38,4 @@ print("max movie id: ", df_small.movie_idx.max())
 
 
 print("small dataframe size: ", len(df_small))
-df_small.to_csv('./very_small_rating.csv')
+df_small.to_csv('./data/very_small_rating.csv')

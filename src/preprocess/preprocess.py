@@ -18,4 +18,4 @@ df['movie_idx'] = df.apply(lambda row: movie2idx[row.movieId], axis=1)
 
 df = df.drop(columns='timestamp')
 
-df.to_csv('./edited_rating.csv')
+df.to_csv('./data/edited_rating.csv')
