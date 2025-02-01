@@ -106,7 +106,7 @@ for i in range(N):
 
     current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     elapsed_time = time.time() - start_time
-    percentage_completed = round((i / N) * 100, 2)
+    percentage_completed = round((i / N, 4) * 100, 2)
     print(f"[{current_time}] Porcentaje completado: {percentage_completed}%, Tiempo transcurrido: {elapsed_time:.2f} segundos")
 
 def predict(i, m):
