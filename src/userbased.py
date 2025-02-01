@@ -25,10 +25,10 @@ with open('./preprocess/data/usermovie2rating.json', 'rb') as f:
 with open('./preprocess/data/usermovie2rating_test.json', 'rb') as f:
     usermovie2rating_test = pickle.load(f)
 
-print(len(user2movie))
-print(len(movie2user))
-print(len(usermovie2rating))
-print(len(usermovie2rating_test))
+#print(len(user2movie))
+#print(len(movie2user))
+#print(len(usermovie2rating))
+#print(len(usermovie2rating_test))
 
 
 N = np.max(list(user2movie.keys())) + 1
@@ -39,10 +39,10 @@ M = max(m1, m2) + 1
 print('N: ', N, 'M: ', M)
 
 
-if N > 1000:
-    print("N =", N, "are you sure you want to continue?")
-    print("Comment out these lines so...")
-    exit()
+#if N > 1000:
+#    print("N =", N, "are you sure you want to continue?")
+#    print("Comment out these lines so...")
+#    exit()
 
 
 
@@ -110,3 +110,28 @@ def predict(i, m):
     prediction = min(5, prediction)
     prediction = max(0.5, prediction)
     return prediction
+
+train_predictions = []
+train_targets = []
+for (i, m), target in usermovie2rating.items():
+    prediction = predict(i, m)
+
+    train_predictions.append(prediction)
+    train_targets.append(target)
+
+test_prediction = []
+test_targets = []
+for (i, m), target in usermovie2rating_test.items():
+    prediction = predict(i, m)
+
+    test_prediction.append(prediction)
+    test_targets.append(target)
+
+
+def mse(p ,t):
+    p = np.array(p)
+    t = np.array(t)
+    return np.mean((p - t) ** 2)
+
+print('train mse:', mse(train_predictions, train_targets))
+print('test mse:', mse(test_prediction, test_targets))
