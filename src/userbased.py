@@ -70,7 +70,7 @@ for i in range(N):
     # Calcula la desviación que el usuario dio a cada calificación y lo almacena en un diccionario itém:desviación
     dev_i_dict = { movie:(rating - avg_i) for movie, rating in ratings_i.items()}
     # Obtiene la lista de desviaciones y calcula su cuadrado y lo almacena
-    dev_i_values = np.array(list(dev_i_values.values()))
+    dev_i_values = np.array(list(dev_i_dict.values()))
     sigma_i = np.sqrt(dev_i_values.dot(dev_i_values))
 
     # Almacena el promedio de las calificaciones del usuario y la cada unas de las desviaciones de sus califaciones
