@@ -1,8 +1,8 @@
+import os
 import pickle
 import numpy as np
 from sortedcontainers import SortedList
 
-import os
 if not os.path.exists('./preprocess/data/user2movie.json') or \
     not os.path.exists('./preprocess/data/movie2user.json') or \
     not os.path.exists('./preprocess/data/usermovie2rating.json') or \
