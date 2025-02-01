@@ -39,7 +39,7 @@ print("\nNumero total de usuarios: ", N)
 m1 = np.max(list(movie2user.keys())) + 1
 m2 = np.max([m for (u, m), r in usermovie2rating_test.items()])
 M = max(m1, m2)
-print("Numero total de itéms (peliculas): ", M)
+print("Numero total de ítems (peliculas): ", M)
 
 
 #Calculate the weights
@@ -53,18 +53,18 @@ start_time = time.time()
 print('\nCalculando los pesos (weights)...')
 print('Con la siguente configuración: ')
 print('K: ', K, ' (cantidad maxima de vecinos que almacenaremos por cada usuario)')
-print('limit: ', limit, ' (minima cantidad de itéms en comun que deben tener dos usuarios para calcular la correlación)\n')
+print('limit: ', limit, ' (minima cantidad de ítems en comun que deben tener dos usuarios para calcular la correlación)\n')
 for i in range(N):
 
-    # Obtiene la lista de itéms que el usuario califico
+    # Obtiene la lista de ítems que el usuario califico
     movies_i = user2movie[i]
     movies_i_set = set(movies_i)
 
-    # Crea un diccionario itém:calificación de todas los itéms que el usuario califico
+    # Crea un diccionario ítem:calificación de todas los ítems que el usuario califico
     ratings_i = { movie:usermovie2rating[(i, movie)] for movie in movies_i}
     # Calculo del promedio de las calificaciones del usuario
     avg_i = np.mean(list(ratings_i.values()))
-    # Calcula la desviación que el usuario dio a cada calificación y lo almacena en un diccionario itém:desviación
+    # Calcula la desviación que el usuario dio a cada calificación y lo almacena en un diccionario ítem:desviación
     dev_i_dict = { movie:(rating - avg_i) for movie, rating in ratings_i.items()}
     # Obtiene la lista de desviaciones y calcula su cuadrado y lo almacena
     dev_i_values = np.array(list(dev_i_dict.values()))
@@ -78,12 +78,12 @@ for i in range(N):
     sl = SortedList()
     for j in range(N): # Como podemos ver aca hacemos otro ciclo hasta N, por lo cual a partir de este momento el algoritmo es O(N ^ 2)
         if j != i: # No nos interesa calcular el peso con uno mismo
-            # Obtenemos los itéms que el usuario j evaluo
+            # Obtenemos los ítems que el usuario j evaluo
             movies_j = user2movie[j]
             movies_j_set = set(movies_j)
-            # Obtenemos una lista comun de itéms entre el usuario i y el usuario j
+            # Obtenemos una lista comun de ítems entre el usuario i y el usuario j
             common_movies = (movies_i_set & movies_j_set)
-            if len(common_movies) > limit: # Solo nos interesa calcular el peso cuando la cantidad de itéms en comun es mayor a la variale limit
+            if len(common_movies) > limit: # Solo nos interesa calcular el peso cuando la cantidad de ítems en comun es mayor a la variale limit
                 # Hacemos el mismo procedimento del calculo de promedios y desviacions de arriba pero con el usuario j
                 ratings_j = { movie:usermovie2rating[(j, movie)] for movie in movies_j}
                 avg_j = np.mean(list(ratings_j.values()))
@@ -112,10 +112,10 @@ for i in range(N):
 def predict(i, m):
     numerator = 0
     denominator = 0
-    # Recorremos la lista de vecinos del usuario i, buscando si alguno de los vecinos califico el itém m
+    # Recorremos la lista de vecinos del usuario i, buscando si alguno de los vecinos califico el ítem m
     for neg_w, j in neighbors[i]:
         try:
-            # En numerador almacenamos la multiplicacion del peso entre el usuario i y j por la desviación del usuario j con el itém m
+            # En numerador almacenamos la multiplicacion del peso entre el usuario i y j por la desviación del usuario j con el ítem m
             numerator += -neg_w * deviations[j][m]
             # En denominador guardamos la suma de los pesos
             denominator += abs(neg_w)
