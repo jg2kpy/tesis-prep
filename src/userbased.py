@@ -53,7 +53,7 @@ start_time = time.time()
 print('\nCalculando los pesos (weights)...')
 print('Con la siguente configuración: ')
 print('K: ', K, ' (cantidad maxima de vecinos que almacenaremos por cada usuario)')
-print('limit: ', limit, ' (minima cantidad de itéms en comun que deben tener dos usuarios para calcular la correlación)')
+print('limit: ', limit, ' (minima cantidad de itéms en comun que deben tener dos usuarios para calcular la correlación)\n')
 for i in range(N):
 
     # Obtiene la lista de itéms que el usuario califico
