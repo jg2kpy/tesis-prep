@@ -7,6 +7,9 @@ if not os.path.exists('./preprocess/data/user2movie.json') or \
     not os.path.exists('./preprocess/data/movie2user.json') or \
     not os.path.exists('./preprocess/data/usermovie2rating.json') or \
     not os.path.exists('./preprocess/data/usermovie2rating_test.json'):
+    print("Running preprocess...")
+    import preprocess.preprocess
+    import preprocess.preprocess_shrink
     import preprocess.preprocess2dict
 
 with open('./preprocess/data/user2movie.json', 'rb') as f:
@@ -40,8 +43,6 @@ print('N: ', N, 'M: ', M)
 #    print("Comment out these lines so...")
 #    exit()
 
-
-
 #Calculate the weights
 K = 25
 limit = 5
@@ -49,6 +50,8 @@ neighbors = []
 averages = []
 deviations = []
 
+print('Calculating the weights...')
+print(f'With this configuration, k={K}, limit={limit}')
 for i in range(N):
 
     movies_i = user2movie[i]
@@ -86,8 +89,7 @@ for i in range(N):
 
     neighbors.append(sl)
 
-    if i % 1 == 0:
-        print(i)
+    print("Percentage completed: ", i/N * 100, "%")
 
 def predict(i, m):
     numerator = 0
