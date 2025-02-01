@@ -2,6 +2,7 @@ import os
 import pickle
 import numpy as np
 from sortedcontainers import SortedList
+import time
 
 print('Cargamos los datos preprocesados...')
 if not os.path.exists('./preprocess/data/user2movie.json') or \
@@ -47,6 +48,7 @@ limit = 5
 neighbors = []
 averages = []
 deviations = []
+start_time = time.time()
 
 print('\nCalculando los pesos (weights)...')
 print('Con la siguente configuración: ')
@@ -102,7 +104,10 @@ for i in range(N):
     # Almacenamos la lista ordenada como la lista de vecinos por cada usuario
     neighbors.append(sl)
 
-    print("Porcentaje completado: ", i/N * 100, "%")
+    current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    elapsed_time = time.time() - start_time
+    percentage_completed = round((i / N) * 100, 2)
+    print(f"[{current_time}] Porcentaje completado: {percentage_completed}%, Tiempo transcurrido: {elapsed_time:.2f} segundos")
 
 def predict(i, m):
     numerator = 0
