@@ -37,7 +37,7 @@ print("\nNumero total de usuarios: ", N)
 
 m1 = np.max(list(movie2user.keys())) + 1
 m2 = np.max([m for (u, m), r in usermovie2rating_test.items()])
-M = max(m1, m2) + 1
+M = max(m1, m2)
 print("Numero total de itéms (peliculas): ", M)
 
 
@@ -102,7 +102,7 @@ for i in range(N):
     # Almacenamos la lista ordenada como la lista de vecinos por cada usuario
     neighbors.append(sl)
 
-    print("\nPorcentaje completado: ", i/N * 100, "%")
+    print("Porcentaje completado: ", i/N * 100, "%")
 
 def predict(i, m):
     numerator = 0
