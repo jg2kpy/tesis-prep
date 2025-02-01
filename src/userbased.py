@@ -25,7 +25,7 @@ with open('./preprocess/data/usermovie2rating.json', 'rb') as f:
 with open('./preprocess/data/usermovie2rating_test.json', 'rb') as f:
     usermovie2rating_test = pickle.load(f)
 
-print('Longitud de los datos preprocesados:')
+print('\nLongitud de los datos preprocesados:')
 print("user2movie: ", len(user2movie))
 print("movie2user: ", len(movie2user))
 print("usermovie2rating: ", len(usermovie2rating))
@@ -33,18 +33,13 @@ print("usermovie2rating_test: ", len(usermovie2rating_test))
 
 
 N = np.max(list(user2movie.keys())) + 1
-print("Numero total de usuarios: ", N)
+print("\nNumero total de usuarios: ", N)
 
 m1 = np.max(list(movie2user.keys())) + 1
 m2 = np.max([m for (u, m), r in usermovie2rating_test.items()])
 M = max(m1, m2) + 1
 print("Numero total de itéms (peliculas): ", M)
 
-
-#if N > 1000:
-#    print("N =", N, "are you sure you want to continue?")
-#    print("Comment out these lines so...")
-#    exit()
 
 #Calculate the weights
 K = 25
@@ -53,7 +48,7 @@ neighbors = []
 averages = []
 deviations = []
 
-print('Calculando los pesos (weights)...')
+print('\nCalculando los pesos (weights)...')
 print('Con la siguente configuración: ')
 print('K: ', K, ' (cantidad maxima de vecinos que almacenaremos por cada usuario)')
 print('limit: ', limit, ' (minima cantidad de itéms en comun que deben tener dos usuarios para calcular la correlación)')
@@ -107,7 +102,7 @@ for i in range(N):
     # Almacenamos la lista ordenada como la lista de vecinos por cada usuario
     neighbors.append(sl)
 
-    print("Percentage completed: ", i/N * 100, "%")
+    print("\nPorcentaje completado: ", i/N * 100, "%")
 
 def predict(i, m):
     numerator = 0
@@ -132,7 +127,7 @@ def predict(i, m):
     prediction = max(0.5, prediction)
     return prediction
 
-# Ahora empezamos a hacer predicciones
+print('\nAhora empezamos a hacer predicciones')
 train_predictions = []
 train_targets = []
 for (i, m), target in usermovie2rating.items():
@@ -156,5 +151,5 @@ def mse(p ,t):
     t = np.array(t)
     return np.mean((p - t) ** 2)
 
-print('train mse:', mse(train_predictions, train_targets))
-print('test mse:', mse(test_prediction, test_targets))
+print('\nError cuadrado medio comparando con los datos de entrenamiento:', mse(train_predictions, train_targets))
+print('Error cuadrado medio comparando con los datos de prueba:', mse(test_prediction, test_targets))
