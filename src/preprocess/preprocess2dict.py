@@ -1,7 +1,5 @@
 import pickle
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from sklearn.utils import shuffle
 
 df = pd.read_csv('./data/very_small_rating.csv')
