@@ -1,6 +1,8 @@
 import os
 import pickle
 
+import numpy as np
+
 print('Cargamos los datos preprocesados...')
 if not os.path.exists('./preprocess/data/user2movie.json') or \
     not os.path.exists('./preprocess/data/movie2user.json') or \
@@ -29,4 +31,11 @@ print("movie2user: ", len(movie2user))
 print("usermovie2rating: ", len(usermovie2rating))
 print("usermovie2rating_test: ", len(usermovie2rating_test))
 
+N = np.max(list(user2movie.keys())) + 1
+print("\nNumero total de usuarios: ", N)
+
+m1 = np.max(list(movie2user.keys())) + 1
+m2 = np.max([m for (u, m), r in usermovie2rating_test.items()])
+M = max(m1, m2)
+print("Numero total de ítems (peliculas): ", M)
 
