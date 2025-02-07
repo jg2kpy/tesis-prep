@@ -1,7 +1,7 @@
 import pandas as pd
 
 #Leer el dataset
-df = pd.read_csv('../../movielens-20m-dataset/rating.csv')
+df = pd.read_csv('../../../movielens-20m-dataset/rating.csv')
 
 #make the user ids go from 0...N-1
 df.userId = df.userId - 1

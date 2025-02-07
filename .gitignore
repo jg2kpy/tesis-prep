@@ -162,5 +162,5 @@ cython_debug/
 #.idea/
 
 movielens-20m-dataset/
-src/preprocess/data/
+src/Recommender Systems/preprocess/data/
 .csv
