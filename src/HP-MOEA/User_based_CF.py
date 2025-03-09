@@ -4,8 +4,26 @@ import numpy as np
 from sortedcontainers import SortedList
 import time
 
+def main(data_path = './data', K = 25, limit = 5, calcular_pesos = False, test = False):
+    user2movie, movie2user, usermovie2rating, usermovie2rating_test = load_preprocessed_data(data_path)
+
+    N = np.max(list(user2movie.keys())) + 1
+    print("\nNumero total de usuarios: ", N)
+
+    m1 = np.max(list(movie2user.keys())) + 1
+    m2 = np.max([m for (u, m), r in usermovie2rating_test.items()])
+    M = max(m1, m2)
+    print("Numero total de ítems (peliculas): ", M)
+
+    if not calcular_pesos:
+        with open(f'{data_path}/users_weights.json', 'rb') as f:
+            neighbors, averages, deviations = pickle.load(f)
+    else:
+        neighbors, averages, deviations = calculate_weights(N, K, limit, user2movie, usermovie2rating)
+        with open(f'{data_path}/users_weights.json', 'wb') as f:
+            pickle.dump((neighbors, averages, deviations), f)
+
 def load_preprocessed_data(data_path):
-        print(f'{data_path}/user2movie.json')
         print('Cargamos los datos preprocesados...')
         user2movie = {}
         movie2user = {}
@@ -37,8 +55,49 @@ def load_preprocessed_data(data_path):
 
         return user2movie, movie2user, usermovie2rating, usermovie2rating_test
 
-def main(data_path = './data', k = 25, limit = 5, test = False):
-    user2movie, movie2user, usermovie2rating, usermovie2rating_test = load_preprocessed_data(data_path)
+def calculate_weights(N, K, limit, user2movie, usermovie2rating):
+        neighbors = []
+        averages = []
+        deviations = []
+        start_time = time.time()
+
+        print('\nCalculando los pesos (weights)...')
+        print('Con la siguente configuración: ')
+        print('K: ', K, ' (cantidad maxima de vecinos que almacenaremos por cada usuario)')
+        print('limit: ', limit, ' (minima cantidad de ítems en comun que deben tener dos usuarios para calcular la correlación)\n')
+        for i in range(N):
+            avg_i, dev_i_dict, sigma_i = calculate_user_stats(i, user2movie[i], usermovie2rating)
+            averages.append(avg_i)
+            deviations.append(dev_i_dict)
+
+            sl = SortedList()
+            for j in range(N):
+                if j != i:
+                    common_movies = (set(user2movie[i]) & set(user2movie[j]))
+                    if len(common_movies) > limit:
+                        avg_j, dev_j, sigma_j = calculate_user_stats(j, user2movie[j], usermovie2rating)
+                        if sigma_i > 0 and sigma_j > 0:  # Verificar que sigma_i y sigma_j no sean cero
+                            numerator = sum(dev_i_dict[m] * dev_j[m] for m in common_movies)
+                            w_ij = numerator / (sigma_i * sigma_j)
+                            sl.add((-w_ij, j))
+                            if len(sl) > K:
+                                del sl[-1]
+            neighbors.append(sl)
+
+            current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            elapsed_time = time.time() - start_time
+            percentage_completed = round((i / N) * 100, 2)
+            print(f"[{current_time}] Porcentaje completado: {percentage_completed}%, Tiempo transcurrido: {elapsed_time:.2f} segundos")
+
+        return neighbors, averages, deviations
+
+def calculate_user_stats(user, movies, usermovie2rating):
+    ratings = {movie: usermovie2rating[(user, movie)] for movie in movies}
+    avg_rating = np.mean(list(ratings.values()))
+    deviations = {movie: (rating - avg_rating) for movie, rating in ratings.items()}
+    deviation_values = np.array(list(deviations.values()))
+    sigma = np.sqrt(deviation_values.dot(deviation_values))
+    return avg_rating, deviations, sigma
 
 if __name__ == "__main__":
     main()
