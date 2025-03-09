@@ -28,11 +28,18 @@ def main(data_path = './data', K = 25, limit = 5, calcular_pesos = False, test =
         with open(f'{data_path}/users_weights.json', 'wb') as f:
             pickle.dump((neighbors, averages, deviations), f)
 
-    ##Hacer los tests
+    if test:
+        error_train, error_test = test_function(usermovie2rating, usermovie2rating_test)
 
     usermovie2predict_rating = make_predictions(N, M, user2movie)
     with open(f'{data_path}/usermovie2predict_rating.json', 'wb') as f:
             pickle.dump(usermovie2predict_rating, f)
+
+    print(f'\nTermino la ejecución del filtrado colaborativo basado en usuarios, los datos se guardaron en {data_path}/usermovie2predict_rating.json')
+    if test:
+        print('Los resultados del testing fueron:')
+        print('Error cuadrado medio comparando con los datos de entrenamiento:', error_train)
+        print('Error cuadrado medio comparando con los datos de prueba:', error_test)
 
 def load_preprocessed_data(data_path):
         print('Cargamos los datos preprocesados...')
@@ -73,7 +80,7 @@ def calculate_weights(N, K, limit, user2movie, usermovie2rating):
         start_time = time.time()
 
         print('\nCalculando los pesos (weights)...')
-        print('Con la siguente configuración: ')
+        print('Con la siguente configuración:')
         print('K: ', K, ' (cantidad maxima de vecinos que almacenaremos por cada usuario)')
         print('limit: ', limit, ' (minima cantidad de ítems en comun que deben tener dos usuarios para calcular la correlación)\n')
         for i in range(N):
@@ -95,10 +102,9 @@ def calculate_weights(N, K, limit, user2movie, usermovie2rating):
                                 del sl[-1]
             neighbors.append(sl)
 
-            current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            elapsed_time = time.time() - start_time
-            percentage_completed = round((i / N) * 100, 2)
-            print(f"[{current_time}] Porcentaje completado: {percentage_completed}%, Tiempo transcurrido: {elapsed_time:.2f} segundos")
+            log('Calculo de pesos', start_time, i, N)
+
+        print('Termino el calculo de los pesos')
 
         return neighbors, averages, deviations
 
@@ -131,7 +137,7 @@ def predict(i, m):
     return prediction
 
 def make_predictions(N, M, user2movie):
-    print('\nIniciamos las predicciones con User Based Collaborative Filtering')
+    print('\nIniciamos las predicciones con User Based Collaborative Filtering...')
     total_movies = set(range(M))
     usermovie2predict_rating = {}
 
@@ -143,12 +149,60 @@ def make_predictions(N, M, user2movie):
         for movie in user2predictmovies:
             usermovie2predict_rating[(i, movie)] = predict(i, movie)
 
+        log('Prediccion', start_time, i, N)
+
+    print('Termino la predicción')
+
+    return usermovie2predict_rating
+
+def test_function(usermovie2rating, usermovie2rating_test):
+    print('\nIniciando testing...')
+    train_predictions = []
+    train_targets = []
+    start_time = time.time()
+    contador = 0
+    for (i, m), target in usermovie2rating.items():
+        contador+=1
+        prediction = predict(i, m)
+
+        train_predictions.append(prediction)
+        train_targets.append(target)
+
+        log('Testing con train set', start_time, contador, len(usermovie2rating))
+
+    test_prediction = []
+    test_targets = []
+    start_time = time.time()
+    contador = 0
+    for (i, m), target in usermovie2rating_test.items():
+        contador+=1
+        prediction = predict(i, m)
+
+        test_prediction.append(prediction)
+        test_targets.append(target)
+        log('Testing con test set', start_time, contador, len(usermovie2rating_test))
+
+    error_train = mse(train_predictions, train_targets)
+    error_test = mse(test_prediction, test_targets)
+
+    print('Termino el testing')
+    #print('\nError cuadrado medio comparando con los datos de entrenamiento:', error_train)
+    #print('Error cuadrado medio comparando con los datos de prueba:', error_test)
+    #print('Continuando la ejecución en 10 segundos')
+    #time.sleep(10)
+    return error_train, error_test
+
+def mse(p ,t):
+    p = np.array(p)
+    t = np.array(t)
+    return np.mean((p - t) ** 2)
+
+def log(funcion, start_time, i, N):
+    if i % max(1, N // 20) == 0:
         current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         elapsed_time = time.time() - start_time
         percentage_completed = round((i / N) * 100, 2)
-        print(f"[{current_time}] Porcentaje completado: {percentage_completed}%, Tiempo transcurrido: {elapsed_time:.2f} segundos")
-
-    return usermovie2predict_rating
+        print(f"[{current_time}] {funcion}: {percentage_completed}%, Transcurrido: {elapsed_time:.2f} segundos")
 
 if __name__ == "__main__":
     main()
