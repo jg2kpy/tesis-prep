@@ -20,7 +20,7 @@ def main(data_path = './data', K = 25, limit = 5, calcular_pesos = False, test =
     M = max(m1, m2)
     print("Numero total de ítems (peliculas): ", M)
 
-    if not calcular_pesos:
+    if calcular_pesos:
         neighbors, averages, deviations = calculate_weights(N, K, limit, user2movie, usermovie2rating)
         with open(f'{data_path}/users_weights.json', 'wb') as f:
             pickle.dump((neighbors, averages, deviations), f)
