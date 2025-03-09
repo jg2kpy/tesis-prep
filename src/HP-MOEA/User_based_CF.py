@@ -4,7 +4,12 @@ import numpy as np
 from sortedcontainers import SortedList
 import time
 
+neighbors = {}
+averages = {}
+deviations = {}
+
 def main(data_path = './data', K = 25, limit = 5, calcular_pesos = False, test = False):
+    global neighbors, averages, deviations
     user2movie, movie2user, usermovie2rating, usermovie2rating_test = load_preprocessed_data(data_path)
 
     N = np.max(list(user2movie.keys())) + 1
@@ -22,6 +27,12 @@ def main(data_path = './data', K = 25, limit = 5, calcular_pesos = False, test =
         neighbors, averages, deviations = calculate_weights(N, K, limit, user2movie, usermovie2rating)
         with open(f'{data_path}/users_weights.json', 'wb') as f:
             pickle.dump((neighbors, averages, deviations), f)
+
+    ##Hacer los tests
+
+    usermovie2predict_rating = make_predictions(N, M, user2movie)
+    with open(f'{data_path}/usermovie2predict_rating.json', 'wb') as f:
+            pickle.dump(usermovie2predict_rating, f)
 
 def load_preprocessed_data(data_path):
         print('Cargamos los datos preprocesados...')
@@ -98,6 +109,46 @@ def calculate_user_stats(user, movies, usermovie2rating):
     deviation_values = np.array(list(deviations.values()))
     sigma = np.sqrt(deviation_values.dot(deviation_values))
     return avg_rating, deviations, sigma
+
+def predict(i, m):
+    global neighbors, averages, deviations
+    numerator = 0
+    denominator = 0
+    for neg_w, j in neighbors[i]:
+        try:
+            numerator += -neg_w * deviations[j][m]
+            denominator += abs(neg_w)
+        except KeyError:
+            pass
+
+    if denominator == 0:
+        prediction = averages[i]
+    else:
+        prediction = averages[i] + (numerator / denominator)
+
+    prediction = min(5, prediction)
+    prediction = max(0.5, prediction)
+    return prediction
+
+def make_predictions(N, M, user2movie):
+    print('\nIniciamos las predicciones con User Based Collaborative Filtering')
+    total_movies = set(range(M))
+    usermovie2predict_rating = {}
+
+    start_time = time.time()
+    for i in range(N):
+        user2movie_i = set(user2movie[i])
+        user2predictmovies = list(total_movies - user2movie_i)
+
+        for movie in user2predictmovies:
+            usermovie2predict_rating[(i, movie)] = predict(i, movie)
+
+        current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        elapsed_time = time.time() - start_time
+        percentage_completed = round((i / N) * 100, 2)
+        print(f"[{current_time}] Porcentaje completado: {percentage_completed}%, Tiempo transcurrido: {elapsed_time:.2f} segundos")
+
+    return usermovie2predict_rating
 
 if __name__ == "__main__":
     main()
