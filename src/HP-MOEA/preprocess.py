@@ -5,9 +5,9 @@ from sklearn.utils import shuffle
 
 count = 0
 
-def main(dataset_path, top_usuarios, top_peliculas):
+def main(dataset_path, output_path, top_usuarios, top_peliculas):
     # Leer el dataset
-    print("Leyendo el dataset desde:", dataset_path)
+    print("\nLeyendo el dataset desde:", dataset_path)
     df = pd.read_csv(dataset_path)
 
     # Ajustar los IDs de usuario para que comiencen desde 0
@@ -29,7 +29,7 @@ def main(dataset_path, top_usuarios, top_peliculas):
     print("Eliminando la columna 'timestamp'")
     df = df.drop(columns='timestamp')
 
-    print("Tamaño del dataframe original:", len(df))
+    print("\nTamaño del dataframe original:", len(df))
 
     # Contar la cantidad de ratings por usuario y por película
     print("Contando la cantidad de ratings por usuario y por película")
@@ -66,11 +66,8 @@ def main(dataset_path, top_usuarios, top_peliculas):
 
     print("Tamaño del dataframe reducido:", len(df_small))
 
-    N = df.userId.max() + 1
-    M = df.movie_idx.max() + 1
-
     # Barajar el dataframe
-    print("Barajando el dataframe")
+    print("\nBarajando el dataframe")
     df = shuffle(df)
     cutoff = int(0.8 * len(df))
     df_train = df.iloc[:cutoff]
@@ -118,21 +115,21 @@ def main(dataset_path, top_usuarios, top_peliculas):
 
     # Guardar los diccionarios en archivos
     print("Guardando los diccionarios en archivos")
-    with open('./data/user2movie.json', 'wb') as f:
+    with open(f'{output_path}/user2movie.json', 'wb') as f:
         pickle.dump(user2movie, f)
-        print("user2movie guardado en ./data/user2movie.json")
+        print(f"user2movie guardado en {output_path}/user2movie.json")
 
-    with open('./data/movie2user.json', 'wb') as f:
+    with open(f'{output_path}/movie2user.json', 'wb') as f:
         pickle.dump(movie2user, f)
-        print("movie2user guardado en ./data/movie2user.json")
+        print(f"movie2user guardado en {output_path}/movie2user.json")
 
-    with open('./data/usermovie2rating.json', 'wb') as f:
+    with open(f'{output_path}/usermovie2rating.json', 'wb') as f:
         pickle.dump(usermovie2rating, f)
-        print("usermovie2rating guardado en ./data/usermovie2rating.json")
+        print(f"usermovie2rating guardado en {output_path}/usermovie2rating.json")
 
-    with open('./data/usermovie2rating_test.json', 'wb') as f:
+    with open(f'{output_path}/usermovie2rating_test.json', 'wb') as f:
         pickle.dump(usermovie2rating_test, f)
-        print("usermovie2rating_test guardado en ./data/usermovie2rating_test.json")
+        print(f"usermovie2rating_test guardado en {output_path}/usermovie2rating_test.json")
 
 if __name__ == "__main__":
     main()
