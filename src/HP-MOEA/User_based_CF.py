@@ -8,7 +8,7 @@ neighbors = {}
 averages = {}
 deviations = {}
 
-def main(data_path = './data', K = 25, limit = 5, calcular_pesos = False, test = False):
+def main(data_path = './data/', K = 25, limit = 5, calcular_pesos = False, test = False):
     global neighbors, averages, deviations
     user2movie, movie2user, usermovie2rating, usermovie2rating_test = load_preprocessed_data(data_path)
 
