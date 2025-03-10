@@ -115,21 +115,21 @@ def main(dataset_path, output_path = './data/', top_usuarios = 100000, top_pelic
 
     # Guardar los diccionarios en archivos
     print("Guardando los diccionarios en archivos")
-    with open(f'{output_path}user2movie.json', 'wb') as f:
+    with open(f'{output_path}user2movie.pickle', 'wb') as f:
         pickle.dump(user2movie, f)
-        print(f"user2movie guardado en {output_path}user2movie.json")
+        print(f"user2movie guardado en {output_path}user2movie.pickle")
 
-    with open(f'{output_path}movie2user.json', 'wb') as f:
+    with open(f'{output_path}movie2user.pickle', 'wb') as f:
         pickle.dump(movie2user, f)
-        print(f"movie2user guardado en {output_path}movie2user.json")
+        print(f"movie2user guardado en {output_path}movie2user.pickle")
 
-    with open(f'{output_path}usermovie2rating.json', 'wb') as f:
+    with open(f'{output_path}usermovie2rating.pickle', 'wb') as f:
         pickle.dump(usermovie2rating, f)
-        print(f"usermovie2rating guardado en {output_path}usermovie2rating.json")
+        print(f"usermovie2rating guardado en {output_path}usermovie2rating.pickle")
 
-    with open(f'{output_path}usermovie2rating_test.json', 'wb') as f:
+    with open(f'{output_path}usermovie2rating_test.pickle', 'wb') as f:
         pickle.dump(usermovie2rating_test, f)
-        print(f"usermovie2rating_test guardado en {output_path}usermovie2rating_test.json")
+        print(f"usermovie2rating_test guardado en {output_path}usermovie2rating_test.pickle")
 
 if __name__ == "__main__":
     main()

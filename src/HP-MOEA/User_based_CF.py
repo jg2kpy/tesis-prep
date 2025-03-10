@@ -22,20 +22,20 @@ def main(data_path = './data/', K = 25, limit = 5, calcular_pesos = False, test 
 
     if calcular_pesos:
         neighbors, averages, deviations = calculate_weights(N, K, limit, user2movie, usermovie2rating)
-        with open(f'{data_path}users_weights.json', 'wb') as f:
+        with open(f'{data_path}users_weights.pickle', 'wb') as f:
             pickle.dump((neighbors, averages, deviations), f)
     else:
-        with open(f'{data_path}users_weights.json', 'rb') as f:
+        with open(f'{data_path}users_weights.pickle', 'rb') as f:
             neighbors, averages, deviations = pickle.load(f)
 
     if test:
         error_train, error_test = test_function(usermovie2rating, usermovie2rating_test)
 
     usermovie2predict_rating = make_predictions(N, M, user2movie)
-    with open(f'{data_path}usermovie2predict_rating.json', 'wb') as f:
+    with open(f'{data_path}usermovie2predict_rating.pickle', 'wb') as f:
             pickle.dump(usermovie2predict_rating, f)
 
-    print(f'\nTermino la ejecución del filtrado colaborativo basado en usuarios, los datos se guardaron en {data_path}usermovie2predict_rating.json')
+    print(f'\nTermino la ejecución del filtrado colaborativo basado en usuarios, los datos se guardaron en {data_path}usermovie2predict_rating.pickle')
     if test:
         print('Los resultados del testing fueron:')
         print('Error cuadrado medio comparando con los datos de entrenamiento:', error_train)
@@ -50,21 +50,21 @@ def load_preprocessed_data(data_path):
         usermovie2rating = {}
         usermovie2rating_test = {}
 
-        if os.path.exists(f'{data_path}user2movie.json') and \
-            os.path.exists(f'{data_path}movie2user.json') and \
-            os.path.exists(f'{data_path}usermovie2rating.json') and \
-            os.path.exists(f'{data_path}usermovie2rating_test.json'):
+        if os.path.exists(f'{data_path}user2movie.pickle') and \
+            os.path.exists(f'{data_path}movie2user.pickle') and \
+            os.path.exists(f'{data_path}usermovie2rating.pickle') and \
+            os.path.exists(f'{data_path}usermovie2rating_test.pickle'):
 
-            with open(f'{data_path}user2movie.json', 'rb') as f:
+            with open(f'{data_path}user2movie.pickle', 'rb') as f:
                 user2movie = pickle.load(f)
 
-            with open(f'{data_path}movie2user.json', 'rb') as f:
+            with open(f'{data_path}movie2user.pickle', 'rb') as f:
                 movie2user = pickle.load(f)
 
-            with open(f'{data_path}usermovie2rating.json', 'rb') as f:
+            with open(f'{data_path}usermovie2rating.pickle', 'rb') as f:
                 usermovie2rating = pickle.load(f)
 
-            with open(f'{data_path}usermovie2rating_test.json', 'rb') as f:
+            with open(f'{data_path}usermovie2rating_test.pickle', 'rb') as f:
                 usermovie2rating_test = pickle.load(f)
 
         print('\nLongitud de los datos preprocesados:')
