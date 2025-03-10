@@ -2,7 +2,7 @@ import os
 import pickle
 import numpy as np
 from sortedcontainers import SortedList
-import time
+import logger
 
 neighbors = {}
 averages = {}
@@ -41,6 +41,8 @@ def main(data_path = './data', K = 25, limit = 5, calcular_pesos = False, test =
         print('Error cuadrado medio comparando con los datos de entrenamiento:', error_train)
         print('Error cuadrado medio comparando con los datos de prueba:', error_test)
 
+    return usermovie2predict_rating
+
 def load_preprocessed_data(data_path):
         print('Cargamos los datos preprocesados...')
         user2movie = {}
@@ -77,7 +79,7 @@ def calculate_weights(N, K, limit, user2movie, usermovie2rating):
         neighbors = []
         averages = []
         deviations = []
-        start_time = time.time()
+        log = logger.logger_class('Calculo de pesos')
 
         print('\nCalculando los pesos (weights)...')
         print('Con la siguente configuración:')
@@ -102,7 +104,7 @@ def calculate_weights(N, K, limit, user2movie, usermovie2rating):
                                 del sl[-1]
             neighbors.append(sl)
 
-            log('Calculo de pesos', start_time, i, N)
+            log.percentage(i, N)
 
         print('Termino el calculo de los pesos')
 
@@ -141,7 +143,7 @@ def make_predictions(N, M, user2movie):
     total_movies = set(range(M))
     usermovie2predict_rating = {}
 
-    start_time = time.time()
+    log = logger.logger_class('Prediccion')
     for i in range(N):
         user2movie_i = set(user2movie[i])
         user2predictmovies = list(total_movies - user2movie_i)
@@ -149,7 +151,7 @@ def make_predictions(N, M, user2movie):
         for movie in user2predictmovies:
             usermovie2predict_rating[(i, movie)] = predict(i, movie)
 
-        log('Prediccion', start_time, i, N)
+        log.percentage(i, N)
 
     print('Termino la predicción')
 
@@ -159,7 +161,7 @@ def test_function(usermovie2rating, usermovie2rating_test):
     print('\nIniciando testing...')
     train_predictions = []
     train_targets = []
-    start_time = time.time()
+    log = logger.logger_class('Testing con train set')
     contador = 0
     for (i, m), target in usermovie2rating.items():
         contador+=1
@@ -168,11 +170,11 @@ def test_function(usermovie2rating, usermovie2rating_test):
         train_predictions.append(prediction)
         train_targets.append(target)
 
-        log('Testing con train set', start_time, contador, len(usermovie2rating))
+        log.percentage(contador, len(usermovie2rating))
 
     test_prediction = []
     test_targets = []
-    start_time = time.time()
+    log = logger.logger_class('Testing con test set')
     contador = 0
     for (i, m), target in usermovie2rating_test.items():
         contador+=1
@@ -180,7 +182,7 @@ def test_function(usermovie2rating, usermovie2rating_test):
 
         test_prediction.append(prediction)
         test_targets.append(target)
-        log('Testing con test set', start_time, contador, len(usermovie2rating_test))
+        log.percentage(contador, len(usermovie2rating_test))
 
     error_train = mse(train_predictions, train_targets)
     error_test = mse(test_prediction, test_targets)
@@ -196,13 +198,6 @@ def mse(p ,t):
     p = np.array(p)
     t = np.array(t)
     return np.mean((p - t) ** 2)
-
-def log(funcion, start_time, i, N):
-    if i % max(1, N // 20) == 0:
-        current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        elapsed_time = time.time() - start_time
-        percentage_completed = round((i / N) * 100, 2)
-        print(f"[{current_time}] {funcion}: {percentage_completed}%, Transcurrido: {elapsed_time:.2f} segundos")
 
 if __name__ == "__main__":
     main()
