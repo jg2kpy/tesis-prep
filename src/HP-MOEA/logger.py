@@ -16,6 +16,11 @@ class logger_class():
     def info(self, mensaje):
         current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         elapsed_time = time.time() - self.start_time
+        print(f"{JP_YELLOW}[{current_time}] {self.function}: {mensaje}, Transcurrido: {elapsed_time:.2f} segundos{JP_RESET_ALL}")
+
+    def success(self, mensaje):
+        current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        elapsed_time = time.time() - self.start_time
         print(f"{JP_GREEN}[{current_time}] {self.function}: {mensaje}, Transcurrido: {elapsed_time:.2f} segundos{JP_RESET_ALL}")
 
     def percentage(self, i, N, mensaje = ""):
@@ -23,9 +28,9 @@ class logger_class():
         elapsed_time = time.time() - self.start_time
         if i % max(1, N // 20) == 0 or elapsed_time - (self.last_log_time - self.start_time) >= 5:
             percentage_completed = round((i / N) * 100, 2)
-            print(f"{JP_GREEN}[{current_time}] {self.function}: {percentage_completed}%, Transcurrido: {elapsed_time:.2f} segundos{JP_RESET_ALL}")
+            print(f"{JP_YELLOW}[{current_time}] {self.function}: {percentage_completed}%, Transcurrido: {elapsed_time:.2f} segundos{JP_RESET_ALL}")
             if mensaje != "":
-                print(f"{JP_GREEN}[{current_time}] {self.function}: {mensaje}{JP_RESET_ALL}")
+                print(f"{JP_YELLOW}[{current_time}] {self.function}: {mensaje}{JP_RESET_ALL}")
             self.last_log_time = time.time()
 
     def error(self, error):

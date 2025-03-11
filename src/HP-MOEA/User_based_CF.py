@@ -153,7 +153,7 @@ def make_predictions(N, M, user2movie):
 
         log.percentage(i, N)
 
-    print('Termino la predicción')
+    log.success('Termino la predicción')
 
     return usermovie2predict_rating
 
