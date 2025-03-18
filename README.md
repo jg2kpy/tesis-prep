@@ -2,6 +2,8 @@
 
 Este repositorio servirá para registrar mi preparación con el objetivo de desarrollar mi TFG.
 
+El tutor es el profesor y directo de carrera Dr. Christian Daniel von Lücken Martínez (clucken@pol.una.py)
+
 ## Temas clave a estudiar
 
 Para la realización de mi TFG, debo profundizar en los siguientes temas:
