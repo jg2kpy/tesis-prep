@@ -76,6 +76,7 @@ def main(dataset_path, output_path = './data/', top_usuarios = 100000, top_pelic
     user2movie = {}
     movie2user = {}
     usermovie2rating = {}
+    movie2profit = {}
     print("Llamando a: update_user2movie_and_movie2user")
     def update_user2movie_and_movie2user(row):
         global count
@@ -113,6 +114,19 @@ def main(dataset_path, output_path = './data/', top_usuarios = 100000, top_pelic
         usermovie2rating_test[(i, j)] = row.rating
     df_test.apply(udpate_usermovie2rating_test, axis=1)
 
+    def calcular_profit(ratings):
+        if not ratings:
+            return 0
+        positive_ratings = sum(1 for rating in ratings if rating >= 3)
+        return 1 + (9 * (positive_ratings / len(ratings)))
+
+    # Calcular el "profit" para cada película basado en sus calificaciones
+    print("Calculando el profit para cada película")
+    for movie_id, users in movie2user.items():
+        ratings = [usermovie2rating[(user, movie_id)] for user in users]
+        profit = calcular_profit(ratings) if ratings else 0
+        movie2profit[movie_id] = profit
+
     # Guardar los diccionarios en archivos
     print("Guardando los diccionarios en archivos")
     with open(f'{output_path}user2movie.pickle', 'wb') as f:
@@ -130,6 +144,10 @@ def main(dataset_path, output_path = './data/', top_usuarios = 100000, top_pelic
     with open(f'{output_path}usermovie2rating_test.pickle', 'wb') as f:
         pickle.dump(usermovie2rating_test, f)
         print(f"usermovie2rating_test guardado en {output_path}usermovie2rating_test.pickle")
+
+    with open(f'{output_path}movie2profit.pickle', 'wb') as f:
+        pickle.dump(movie2profit, f)
+        print(f"movie2profit guardado en {output_path}movie2profit.pickle")
 
 if __name__ == "__main__":
     main()
