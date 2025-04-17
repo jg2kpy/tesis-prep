@@ -1,17 +1,19 @@
-# Preparación para Tesis
+# Preparación para Trabajo final de Grado (TFG)
 
-Este repositorio servirá para registrar mi preparación con el objetivo de desarrollar mi tesis.
+Este repositorio servirá para registrar mi preparación con el objetivo de desarrollar mi TFG.
+
+El tutor es el profesor y directo de carrera Dr. Christian Daniel von Lücken Martínez (clucken@pol.una.py)
 
 ## Temas clave a estudiar
 
-Para la realización de mi tesis, debo profundizar en los siguientes temas:
+Para la realización de mi TFG, debo profundizar en los siguientes temas:
 
 - **Sistemas de recomendación**
 - **Algoritmos evolutivos multiobjetivos**
 
-## Tema preliminar de tesis
+## Tema preliminar de TFG
 
-Actualmente, el tema propuesto para mi tesis es:
+Actualmente, el tema propuesto para mi TFG es:
 
 > **"Análisis y comparación cuantitativa de diversos operadores genéticos aplicados en un sistema de recomendación implementado con algoritmos evolutivos multiobjetivos."**
 
