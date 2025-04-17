@@ -68,7 +68,7 @@ def main(dataset_path, output_path = './data/', top_usuarios = 100000, top_pelic
 
     # Barajar el dataframe
     print("\nBarajando el dataframe")
-    df = shuffle(df)
+    df = shuffle(df_small)
     cutoff = int(0.8 * len(df))
     df_train = df.iloc[:cutoff]
     df_test = df.iloc[cutoff:]
