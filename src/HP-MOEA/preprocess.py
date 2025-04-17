@@ -5,7 +5,7 @@ from sklearn.utils import shuffle
 
 count = 0
 
-def main(dataset_path, output_path = './data/', top_usuarios = 100000, top_peliculas = 20000):
+def main(dataset_path, output_path = './data', top_usuarios = 100000, top_peliculas = 20000):
     # Leer el dataset
     print("\nLeyendo el dataset desde:", dataset_path)
     df = pd.read_csv(dataset_path)
@@ -129,25 +129,25 @@ def main(dataset_path, output_path = './data/', top_usuarios = 100000, top_pelic
 
     # Guardar los diccionarios en archivos
     print("Guardando los diccionarios en archivos")
-    with open(f'{output_path}user2movie.pickle', 'wb') as f:
+    with open(f'{output_path}/user2movie.pickle', 'wb') as f:
         pickle.dump(user2movie, f)
-        print(f"user2movie guardado en {output_path}user2movie.pickle")
+        print(f"user2movie guardado en {output_path}/user2movie.pickle")
 
-    with open(f'{output_path}movie2user.pickle', 'wb') as f:
+    with open(f'{output_path}/movie2user.pickle', 'wb') as f:
         pickle.dump(movie2user, f)
-        print(f"movie2user guardado en {output_path}movie2user.pickle")
+        print(f"movie2user guardado en {output_path}/movie2user.pickle")
 
-    with open(f'{output_path}usermovie2rating.pickle', 'wb') as f:
+    with open(f'{output_path}/usermovie2rating.pickle', 'wb') as f:
         pickle.dump(usermovie2rating, f)
-        print(f"usermovie2rating guardado en {output_path}usermovie2rating.pickle")
+        print(f"usermovie2rating guardado en {output_path}/usermovie2rating.pickle")
 
-    with open(f'{output_path}usermovie2rating_test.pickle', 'wb') as f:
+    with open(f'{output_path}/usermovie2rating_test.pickle', 'wb') as f:
         pickle.dump(usermovie2rating_test, f)
-        print(f"usermovie2rating_test guardado en {output_path}usermovie2rating_test.pickle")
+        print(f"usermovie2rating_test guardado en {output_path}/usermovie2rating_test.pickle")
 
-    with open(f'{output_path}movie2profit.pickle', 'wb') as f:
+    with open(f'{output_path}/movie2profit.pickle', 'wb') as f:
         pickle.dump(movie2profit, f)
-        print(f"movie2profit guardado en {output_path}movie2profit.pickle")
+        print(f"movie2profit guardado en {output_path}/movie2profit.pickle")
 
 if __name__ == "__main__":
     main()
