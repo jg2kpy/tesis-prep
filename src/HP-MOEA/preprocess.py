@@ -5,7 +5,7 @@ from sklearn.utils import shuffle
 
 count = 0
 
-def main(dataset_path, output_path = './data', top_usuarios = 100000, top_peliculas = 20000):
+def main(dataset_path, output_path = './data', top_usuarios = 10000, top_peliculas = 2000):
     # Leer el dataset
     print("\nLeyendo el dataset desde:", dataset_path)
     df = pd.read_csv(dataset_path)
