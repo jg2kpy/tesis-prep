@@ -2,9 +2,9 @@ import os
 import pickle
 import numpy as np
 from sortedcontainers import SortedList
-import logger
 
-from classes.Movies_info import Movies_info, Movie_info
+import logger
+from classes.Movies_info import Movies_info
 from classes.Users import Users
 
 neighbors = {}
