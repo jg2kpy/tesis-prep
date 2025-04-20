@@ -9,7 +9,7 @@ from classes.Users import Users
 
 count = 0
 
-def main(dataset_path = '../../datasets/ml-latest-small/ratings.csv', output_path = './data', top_usuarios = 10000, new_comer_filter = 5):
+def main(dataset_path, output_path = './data', top_usuarios = 10000, new_comer_filter = 5):
     global count
     log = logger.logger_class('PREPROCESS')
     print("\nLeyendo el dataset desde:", dataset_path)
