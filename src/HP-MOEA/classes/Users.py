@@ -58,7 +58,7 @@ class Users():
     def get_movies_and_ratings_by_id_user(self, id_user):
         for user in self.users:
             if user.id_user == id_user:
-                return {'movies': user.movies, 'ratings': user.ratings}
+                return [{'movie': movie, 'rating': rating} for movie, rating in zip(user.movies, user.ratings)]
         return None
 
     def get_ratings_by_id_movie(self, id_movie):
@@ -71,6 +71,15 @@ class Users():
 
     def set_users(self, new_users):
         self.users = new_users
+
+    def delete_movie(self, id_movie):
+        count = 0
+        for user in self.users:
+            if user.delete_movie(id_movie):
+                count+=1
+                if user.get_len_movie() == 0:
+                    self.users.remove(user)
+        return count
 
 class User():
     def __init__(self, id_user=None, fromJson=None):
@@ -90,9 +99,29 @@ class User():
             'ratings': self.ratings
         }
 
+    def get_id(self):
+        return self.id_user
+
     def add_movie_rating(self, new_id_movie, new_rating):
         self.movies.append(new_id_movie)
         self.ratings.append(new_rating)
 
     def get_movie_ids(self):
         return self.movies
+
+    def get_ratings(self):
+        return self.ratings
+
+    def get_movies_and_ratings(self):
+        return list(zip(self.movies, self.ratings))
+
+    def delete_movie(self, id_movie):
+        if id_movie in self.movies:
+            position = self.movies.index(id_movie)
+            self.ratings.pop(position)
+            self.movies.pop(position)
+            return True
+        return False
+
+    def get_len_movie(self):
+        return len(self.movies)
