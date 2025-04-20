@@ -12,17 +12,20 @@ neighbors = {}
 averages = {}
 deviations = {}
 
-def main(data_path = './data', K = 25, limit = 5, calcular_pesos = True, test = False):
+def main(data_path = './data', K = 25, limit = 5, eliminar_newcomers = True, calcular_pesos = False, test = True):
     global neighbors, averages, deviations
     users2movie_ratings, movies_info = load_preprocessed_data(data_path)
 
-    eliminados = delete_all_newcomers(users2movie_ratings, movies_info)
+    eliminados = 0
+    if eliminar_newcomers:
+        eliminados = delete_all_newcomers(users2movie_ratings, movies_info)
 
     print(f'\nCantidad de usuarios: {users2movie_ratings.get_len_users()}')
     print(f'Cantidad de peliculas: {movies_info.get_len_movies() - eliminados}')
 
     if test:
         testing_mode(users2movie_ratings, movies_info, K, limit)
+        exit()
 
     if calcular_pesos:
         neighbors, averages, deviations = calculate_weights(users2movie_ratings, K, limit)
@@ -98,7 +101,7 @@ def calculate_weights(users2movie_ratings, K, limit):
 
             log.percentage(i, users_len)
 
-        log.success('Termino el calculo de los pesos')
+        log.success('Termino el calculo de los pesos\n')
 
         return neighbors, averages, deviations
 
@@ -163,41 +166,67 @@ def make_predictions(users2movie_ratings, movies_info):
 
     return users2predict_movie_ratings
 
-def test_function(usermovie2rating, usermovie2rating_test):
-    print('\nIniciando testing...')
-    train_predictions = []
-    train_targets = []
-    log = logger.logger_class('Testing con train set')
-    contador = 0
-    for (i, m), target in usermovie2rating.items():
-        contador+=1
-        prediction = predict(i, m)
+def testing_mode(users2movie_ratings, movies_info, K, limit):
+    global neighbors, averages, deviations
+    all_users = users2movie_ratings.get_all_users()
 
-        train_predictions.append(prediction)
-        train_targets.append(target)
+    users2movie_ratings_train = Users()
+    users2movie_ratings_test = Users()
 
-        log.percentage(contador, len(usermovie2rating))
+    for user in all_users:
+        user_id = user.get_id()
+        movies_and_ratings = user.get_movies_and_ratings()
+        split_index = int(len(movies_and_ratings) * 0.2)
 
-    test_prediction = []
-    test_targets = []
-    log = logger.logger_class('Testing con test set')
-    contador = 0
-    for (i, m), target in usermovie2rating_test.items():
-        contador+=1
-        prediction = predict(i, m)
+        # Split movies and ratings into train and test
+        train_movies_and_ratings = movies_and_ratings[:split_index]
+        test_movies_and_ratings = movies_and_ratings[split_index:]
 
-        test_prediction.append(prediction)
-        test_targets.append(target)
-        log.percentage(contador, len(usermovie2rating_test))
+        # Add user to train with 20% of movies and ratings
+        train_user = users2movie_ratings_train.get_or_create_user_by_id(user_id)
+        for movie, rating in train_movies_and_ratings:
+            train_user.add_movie_rating(movie, rating)
+
+        # Add user to test with the remaining 80% of movies and ratings
+        test_user = users2movie_ratings_test.get_or_create_user_by_id(user_id)
+        for movie, rating in test_movies_and_ratings:
+            test_user.add_movie_rating(movie, rating)
+
+    neighbors, averages, deviations = calculate_weights(users2movie_ratings_train, K, limit)
+
+    error_train, error_test = test_function(users2movie_ratings_train, users2movie_ratings_test)
+
+    print('Los resultados del testing fueron:')
+    print('Error cuadrado medio comparando con los datos de entrenamiento:', error_train)
+    print('Error cuadrado medio comparando con los datos de prueba:', error_test)
+
+def test_function(usermovie2rating_train, usermovie2rating_test):
+    print('Iniciando testing...')
+    log = logger.logger_class('TESTING')
+
+    def get_predictions_and_targets(usermovie2rating_set, log_message):
+        predictions = []
+        targets = []
+        contador = 0
+        users = usermovie2rating_set.get_all_users()
+        log.info(log_message)
+        for user in users:
+            contador += 1
+            for movie_id in user.get_movie_ids():
+                prediction = predict(user.get_id(), movie_id)
+                predictions.append(prediction)
+                targets.append(user.get_rating_by_movie_id(movie_id))
+            log.percentage(contador, usermovie2rating_set.get_len_users())
+        return predictions, targets
+
+    train_predictions, train_targets = get_predictions_and_targets(usermovie2rating_train, 'Testing con train set')
+    print()
+    test_prediction, test_targets = get_predictions_and_targets(usermovie2rating_test, 'Testing con test set')
 
     error_train = mse(train_predictions, train_targets)
     error_test = mse(test_prediction, test_targets)
 
-    print('Termino el testing')
-    #print('\nError cuadrado medio comparando con los datos de entrenamiento:', error_train)
-    #print('Error cuadrado medio comparando con los datos de prueba:', error_test)
-    #print('Continuando la ejecución en 10 segundos')
-    #time.sleep(10)
+    log.success('Termino el testing')
     return error_train, error_test
 
 def delete_all_newcomers(users2movie_ratings, movies_info):
@@ -211,8 +240,6 @@ def delete_all_newcomers(users2movie_ratings, movies_info):
     log.success(f'Se eliminaron {count} calificaciones por ser de newcomers')
     return len(newcomers)
 
-def testing_mode():
-    pass
 
 def mse(p ,t):
     p = np.array(p)

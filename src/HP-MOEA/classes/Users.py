@@ -112,6 +112,10 @@ class User():
     def get_ratings(self):
         return self.ratings
 
+    def get_rating_by_movie_id(self, movie_id):
+        position = self.movies.index(movie_id)
+        return self.ratings[position]
+
     def get_movies_and_ratings(self):
         return list(zip(self.movies, self.ratings))
 
