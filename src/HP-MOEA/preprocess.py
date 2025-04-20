@@ -2,7 +2,6 @@ import os
 import pandas as pd
 import logger
 from collections import Counter
-from sklearn.utils import shuffle
 
 from classes.Movies_info import Movies_info, Movie_info
 from classes.Users import Users
@@ -30,8 +29,7 @@ def main(dataset_path, output_path = './data', top_usuarios = 10000, new_comer_f
     movie_ids_count = Counter(df_small.movieId)
     movies_no_newcomers = [movieId for movieId, count in movie_ids_count.items() if count > new_comer_filter]
     new_comers = [movieId for movieId, count in movie_ids_count.items() if count <= new_comer_filter]
-    movie_ids = movies_no_newcomers
-    movie_ids.extend(new_comers)
+    movie_ids = movies_no_newcomers + new_comers
 
     print(f"Películas que aparecen más de {new_comer_filter} veces: {len(movies_no_newcomers)}")
     print(f"Películas que aparecen menos o igual a {new_comer_filter} veces (Newcomers): {len(new_comers)}")

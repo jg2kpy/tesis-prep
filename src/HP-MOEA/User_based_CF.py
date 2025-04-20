@@ -24,7 +24,8 @@ def main(data_path = './data', K = 25, limit = 5, eliminar_newcomers = True, cal
 
     if test:
         testing_mode(users2movie_ratings, movies_info, K, limit)
-        exit()
+        print('Vuelva a ejecutar con test = False si quiere usar los resultados')
+        return None
 
     if calcular_pesos:
         neighbors, averages, deviations = calculate_weights(users2movie_ratings, K, limit)
