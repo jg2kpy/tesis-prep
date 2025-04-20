@@ -1,116 +1,70 @@
-import pickle
+import os
 import pandas as pd
+import logger
 from collections import Counter
 from sklearn.utils import shuffle
 
+from classes.Movies_info import Movies_info, Movie_info
+from classes.Users import Users
+
 count = 0
 
-def main(dataset_path, output_path = './data', top_usuarios = 10000, new_comer_filter = 5, random_seed = 69):
-    # Leer el dataset
+def main(dataset_path = '../../datasets/ml-latest-small/ratings.csv', output_path = './data', top_usuarios = 10000, new_comer_filter = 5):
+    global count
+    log = logger.logger_class('PREPROCESS')
     print("\nLeyendo el dataset desde:", dataset_path)
-    df = pd.read_csv(dataset_path)
+    df_og = pd.read_csv(dataset_path)
 
-    # Ajustar los IDs de usuario para que comiencen desde 0
-    print("Ajustando los IDs de usuario para que comiencen desde 0")
-    df.userId = df.userId - 1
+    print("\nTamaño del dataframe original:", len(df_og))
 
-    # Crear un mapeo para los IDs de películas
-    print("Creando un mapeo para los IDs de películas")
-    unique_movie_ids = set(df.movieId.values)
-    movie2idx = {}
-    count = 0
-    for movie_id in unique_movie_ids:
-        movie2idx[movie_id] = count
-        count += 1
-
-    df['movie_idx'] = df.apply(lambda row: movie2idx[row.movieId], axis=1)
-
-    # Eliminar la columna 'timestamp'
     print("Eliminando la columna 'timestamp'")
-    df = df.drop(columns='timestamp')
+    df_og = df_og.drop(columns='timestamp')
 
-    print("\nTamaño del dataframe original:", len(df))
-
-
-    # Contar la cantidad de ratings por usuario
-    print("Contando la cantidad de ratings por usuario")
-    user_ids_count = Counter(df.userId)
-
-    # Seleccionar los usuarios más comunes
-    print(f"Seleccionando los {top_usuarios} usuarios películas más comunes")
+    print(f"Seleccionando los {top_usuarios} usuarios películas más comunes...")
+    user_ids_count = Counter(df_og.userId)
     user_ids = [u for u, c in user_ids_count.most_common(top_usuarios)]
 
-    # Filtrar el dataframe para que solo contenga los usuarios seleccionados
-    print("Filtrando el dataframe para que solo contenga los usuarios seleccionados")
-    df_small = df[df.userId.isin(user_ids)].copy()
+    print("Filtrando el dataframe para que solo contenga los usuarios seleccionados...")
+    df_small = df_og[df_og.userId.isin(user_ids)].copy()
 
-    # Crear nuevos mapeos para los IDs de usuario
-    print("Creando nuevos mapeos para los IDs de usuario")
-    new_user_id_map = {}
-    i = 0
-    for old in user_ids:
-        new_user_id_map[old] = i
-        i += 1
+    movie_ids_count = Counter(df_small.movieId)
+    movies_no_newcomers = [movieId for movieId, count in movie_ids_count.items() if count > new_comer_filter]
+    new_comers = [movieId for movieId, count in movie_ids_count.items() if count <= new_comer_filter]
+    movie_ids = movies_no_newcomers
+    movie_ids.extend(new_comers)
 
-    df_small.loc[:, 'userId'] = df_small.apply(lambda row: new_user_id_map[row.userId], axis=1)
+    print(f"Películas que aparecen más de {new_comer_filter} veces: {len(movies_no_newcomers)}")
+    print(f"Películas que aparecen menos o igual a {new_comer_filter} veces (Newcomers): {len(new_comers)}")
 
-    # Obtener los IDs de las películas que aparecen más de 5 veces y menos de 5 veces
-    movie_ids_count = Counter(df_small.movie_idx)
-    movies_more_than_5 = [movie_id for movie_id, count in movie_ids_count.items() if count > new_comer_filter]
-    new_comers = [movie_id for movie_id, count in movie_ids_count.items() if count <= new_comer_filter]
+    print("\nCantidad total de usuarios:", len(user_ids))
+    print("Cantidad total de peliculas:", len(movie_ids))
+    print("Tamaño del dataframe actual:", len(df_small))
 
-    print(f"Películas que aparecen más de {new_comer_filter} veces: {len(movies_more_than_5)}")
-    print(f"Películas que aparecen menos o igual a {new_comer_filter} veces (new_comers): {len(new_comers)}")
+    print("\nGenerando users2movie_ratings...")
+    users2movie_ratings = Users()
+    df_small_len = len(df_small)
+    ratings_by_movie = {}
+    log_users2movie = logger.logger_class('update_users2movie_ratings')
+    count = 0
 
-    print("Creando nuevos mapeos para los IDs de peliculas")
-    new_movie_id_map = {}
-    i = 0
-    for old in movies_more_than_5:
-        new_movie_id_map[old] = i
-        i += 1
-
-    for old in new_comers:
-        new_movie_id_map[old] = i
-        i += 1
-
-    df_small.loc[:, 'movie_idx'] = df_small.apply(lambda row: new_movie_id_map[row.movie_idx], axis=1)
-
-    print("ID máximo de usuario:", df_small.userId.max())
-    print("ID máximo de película:", df_small.movie_idx.max())
-
-    print("Tamaño del dataframe reducido:", len(df_small))
-
-    # Barajar el dataframe
-    print("\nBarajando el dataframe")
-    df_shuffle = shuffle(df_small, random_state=random_seed)
-    df_shuffle_len = len(df_shuffle)
-
-    user2movie = {}
-    movie2user = {}
-    usermovie2rating = {}
-    movie2profit = {}
-    print("Llamando a: update_user2movie_and_movie2user")
-    def update_user2movie_and_movie2user(row):
+    def update_users2movie_ratings(row):
         global count
-        count += 1
-        if count % 10000 == 0:
-            print(f'Procesado: {((float(count) / df_shuffle_len) * 100):.2f}%')
+        if count % 10000:
+            log_users2movie.percentage(count, df_small_len)
+        count+=1
 
-        i = int(row.userId)
-        j = int(row.movie_idx)
+        user_id = int(row.userId)
+        movie_id = int(row.movieId)
+        rating = float(row.rating)
 
-        if i not in user2movie:
-            user2movie[i] = [j]
-        else:
-            user2movie[i].append(j)
+        user = users2movie_ratings.get_or_create_user_by_id(user_id)
 
-        if j not in movie2user:
-            movie2user[j] = [i]
-        else:
-            movie2user[j].append(i)
+        user.add_movie_rating(movie_id, rating)
+        if movie_id not in ratings_by_movie:
+            ratings_by_movie[movie_id] = []
+        ratings_by_movie[movie_id].append(rating)
 
-        usermovie2rating[(i, j)] = row.rating
-    df_shuffle.apply(update_user2movie_and_movie2user, axis=1)
+    df_small.apply(update_users2movie_ratings, axis=1)
 
     def calcular_profit(ratings):
         if not ratings:
@@ -118,42 +72,57 @@ def main(dataset_path, output_path = './data', top_usuarios = 10000, new_comer_f
         positive_ratings = sum(1 for rating in ratings if rating >= 3)
         return 1 + (9 * (positive_ratings / len(ratings)))
 
-    # Calcular el "profit" para cada película basado en sus calificaciones
-    print("Calculando el profit para cada película")
-    for movie_id, users in movie2user.items():
-        ratings = [usermovie2rating[(user, movie_id)] for user in users]
-        profit = calcular_profit(ratings) if ratings else 0
-        movie2profit[movie_id] = profit
+    print("\nGenerando movies_info...")
+    movies_info = Movies_info()
+    log_movies_info = logger.logger_class('Movies_info')
+    count = 0
 
-    # Guardar los diccionarios en archivos
-    print("Guardando las estructuras de datos en archivos")
-    with open(f'{output_path}/user2movie.pickle', 'wb') as f:
-        pickle.dump(user2movie, f)
-        print(f"user2movie guardado en {output_path}/user2movie.pickle")
+    for movie_id in movie_ids:
+        if count % 1000:
+            log_movies_info.percentage(count, len(movie_ids))
+        count+=1
 
-    with open(f'{output_path}/movie2user.pickle', 'wb') as f:
-        pickle.dump(movie2user, f)
-        print(f"movie2user guardado en {output_path}/movie2user.pickle")
+        ratings = ratings_by_movie[movie_id]
+        profit = calcular_profit(ratings)
+        is_newcomer = True if movie_id in new_comers else False
 
-    with open(f'{output_path}/usermovie2rating.pickle', 'wb') as f:
-        pickle.dump(usermovie2rating, f)
-        print(f"usermovie2rating guardado en {output_path}/usermovie2rating.pickle")
+        movie_info = Movie_info(movie_id, profit, is_newcomer)
+        movies_info.add_movie(movie_info)
 
-    with open(f'{output_path}/movie2profit.pickle', 'wb') as f:
-        pickle.dump(movie2profit, f)
-        print(f"movie2profit guardado en {output_path}/movie2profit.pickle")
+    print("\nEliminando usuarios que solo tienen películas newcomers...")
 
-    with open(f'{output_path}/new_comers.pickle', 'wb') as f:
-        pickle.dump(new_comers, f)
-        print(f"new_comers guardado en {output_path}/new_comers.pickle")
+    def has_non_newcomer_movies(user):
+        return any(not movies_info.get_movie_by_id(movie_id).is_newcomer for movie_id in user.get_movie_ids())
 
-    with open(f'{output_path}/new_user_id_map.pickle', 'wb') as f:
-        pickle.dump(new_user_id_map, f)
-        print(f"new_user_id_map guardado en {output_path}/new_user_id_map.pickle")
+    cant_usuarios = users2movie_ratings.get_len_users()
+    valid_users = [user for user in users2movie_ratings.get_all_users() if has_non_newcomer_movies(user)]
+    users2movie_ratings.set_users(valid_users)
 
-    with open(f'{output_path}/new_movie_id_map.pickle', 'wb') as f:
-        pickle.dump(new_movie_id_map, f)
-        print(f"new_movie_id_map guardado en {output_path}/new_movie_id_map.pickle")
+    print(f"Cantidad de usuarios eliminados por solo tener newcomers: {cant_usuarios - len(valid_users)}")
+
+    print("\nGuardando los datos procesados en formato JSON...")
+
+    if not os.path.exists(output_path):
+        print(f"El directorio {output_path} no existe. Creándolo...")
+        try:
+            os.makedirs(output_path)
+        except Exception as e:
+            print(f"Error al crear el directorio {output_path}: {e}")
+            output_path = './data'
+            if not os.path.exists(output_path):
+                print(f"Creando el directorio {output_path} en el directorio actual...")
+                os.makedirs(output_path)
+
+    users_output_file = f"{output_path}/users2movie_ratings.json"
+    movies_output_file = f"{output_path}/movies_info.json"
+
+    with open(users_output_file, 'w') as f:
+        f.write(users2movie_ratings.to_json())
+    log.success(f"Datos de usuarios guardados en: {users_output_file}")
+
+    with open(movies_output_file, 'w') as f:
+        f.write(movies_info.to_json())
+    log.success(f"Datos de películas guardados en: {movies_output_file}")
 
 if __name__ == "__main__":
     main()

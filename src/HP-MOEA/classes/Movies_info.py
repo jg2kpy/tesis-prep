@@ -17,6 +17,19 @@ class Movies_info():
     def to_json(self):
         return json.dumps([movie.to_json() for movie in self.movies_info])
 
+    def get_movie_by_id(self, id_movie):
+        for movie in self.movies_info:
+            if movie.id_movie == id_movie:
+                return movie
+        return None
+
+    def get_or_create_movie_by_id(self, id_movie):
+        for movie in self.movies_info:
+            if movie.id_movie == id_movie:
+                return movie
+        movie = Movie_info(id_movie)
+        return movie
+
     def add_movie(self, new_movie_info):
         self.movies_info.append(new_movie_info)
 
