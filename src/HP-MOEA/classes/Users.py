@@ -20,22 +20,22 @@ class Users():
     def add_user(self, new_user):
         self.users.append(new_user)
 
-    def get_user_by_id(self, id_user):
+    def get_user_by_id(self, user_id):
         for user in self.users:
-            if user.id_user == id_user:
+            if user.user_id == user_id:
                 return user
         return None
 
-    def get_or_create_user_by_id(self, id_user):
+    def get_or_create_user_by_id(self, user_id):
         for user in self.users:
-            if user.id_user == id_user:
+            if user.user_id == user_id:
                 return user
-        user = User(id_user)
+        user = User(user_id)
         self.users.append(user)
         return user
 
-    def get_all_id_users(self):
-        return [user.id_user for user in self.users]
+    def get_all_user_ids(self):
+        return [user.user_id for user in self.users]
 
     def get_all_users(self):
         return self.users
@@ -43,21 +43,21 @@ class Users():
     def get_len_users(self):
         return len(self.users)
 
-    def get_movies_by_id_user(self, id_user):
+    def get_movies_by_user_id(self, user_id):
         for user in self.users:
-            if user.id_user == id_user:
+            if user.user_id == user_id:
                 return user.movies
         return None
 
-    def get_ratings_by_id_user(self, id_user):
+    def get_ratings_by_user_id(self, user_id):
         for user in self.users:
-            if user.id_user == id_user:
+            if user.user_id == user_id:
                 return user.ratings
         return None
 
-    def get_movies_and_ratings_by_id_user(self, id_user):
+    def get_movies_and_ratings_by_user_id(self, user_id):
         for user in self.users:
-            if user.id_user == id_user:
+            if user.user_id == user_id:
                 return [(movie, rating) for movie, rating in zip(user.movies, user.ratings)]
         return None
 
@@ -85,29 +85,29 @@ class Users():
         user_movie_ratings = {}
         for user in self.users:
             for movie, rating in zip(user.movies, user.ratings):
-                user_movie_ratings[(user.id_user, movie)] = rating
+                user_movie_ratings[(user.user_id, movie)] = rating
         return user_movie_ratings
 
 class User():
-    def __init__(self, id_user=None, fromJson=None):
+    def __init__(self, user_id=None, fromJson=None):
         if fromJson:
-            self.id_user = fromJson['id_user']
+            self.user_id = fromJson['user_id']
             self.movies = fromJson['movies']
             self.ratings = fromJson['ratings']
         else:
-            self.id_user = id_user
+            self.user_id = user_id
             self.movies = []
             self.ratings = []
 
     def to_json(self):
         return {
-            'id_user': self.id_user,
+            'user_id': self.user_id,
             'movies': self.movies,
             'ratings': self.ratings
         }
 
     def get_id(self):
-        return self.id_user
+        return self.user_id
 
     def add_movie_rating(self, new_id_movie, new_rating):
         self.movies.append(new_id_movie)
