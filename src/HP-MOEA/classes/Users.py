@@ -58,7 +58,7 @@ class Users():
     def get_movies_and_ratings_by_id_user(self, id_user):
         for user in self.users:
             if user.id_user == id_user:
-                return [{'movie': movie, 'rating': rating} for movie, rating in zip(user.movies, user.ratings)]
+                return [(movie, rating) for movie, rating in zip(user.movies, user.ratings)]
         return None
 
     def get_ratings_by_id_movie(self, id_movie):
@@ -80,6 +80,13 @@ class Users():
                 if user.get_len_movie() == 0:
                     self.users.remove(user)
         return count
+
+    def get_user_movie_ratings(self):
+        user_movie_ratings = {}
+        for user in self.users:
+            for movie, rating in zip(user.movies, user.ratings):
+                user_movie_ratings[(user.id_user, movie)] = rating
+        return user_movie_ratings
 
 class User():
     def __init__(self, id_user=None, fromJson=None):
