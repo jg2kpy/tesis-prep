@@ -45,12 +45,6 @@ class Movies_info():
                 return movie.profit
         return None
 
-    def is_new_comer_by_movie_id(self, movie_id):
-        for movie in self.movies_info:
-            if movie.movie_id == movie_id:
-                return movie.is_newcomer
-        return None
-
     def get_all_newcomers(self):
         all_newcomers = []
         for movie in self.movies_info:

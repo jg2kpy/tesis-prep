@@ -34,40 +34,17 @@ class Users():
         self.users.append(user)
         return user
 
-    def get_all_user_ids(self):
-        return [user.user_id for user in self.users]
-
     def get_all_users(self):
         return self.users
 
     def get_len_users(self):
         return len(self.users)
 
-    def get_movies_by_user_id(self, user_id):
-        for user in self.users:
-            if user.user_id == user_id:
-                return user.movies
-        return None
-
-    def get_ratings_by_user_id(self, user_id):
-        for user in self.users:
-            if user.user_id == user_id:
-                return user.ratings
-        return None
-
     def get_movies_and_ratings_by_user_id(self, user_id):
         for user in self.users:
             if user.user_id == user_id:
                 return [(movie, rating) for movie, rating in zip(user.movies, user.ratings)]
         return None
-
-    def get_ratings_by_movie_id(self, movie_id):
-        ratings = []
-        for user in self.users:
-            for movie, rating in zip(user.movies, user.ratings):
-                if movie == movie_id:
-                    ratings.append(rating)
-        return ratings
 
     def set_users(self, new_users):
         self.users = new_users
