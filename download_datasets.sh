@@ -45,3 +45,12 @@ else
     echo "Error: No se pudo descargar el archivo."
     exit 1
 fi
+
+DATA_DIR="./src/HP-MOEA/data"
+if [ ! -d "$DATA_DIR" ]; then
+    echo "El directorio $DATA_DIR no existe. Creándolo..."
+    mkdir -p "$DATA_DIR"
+    echo "Directorio creado."
+else
+    echo "El directorio $DATA_DIR ya existe."
+fi
