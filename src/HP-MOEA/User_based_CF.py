@@ -143,7 +143,7 @@ def predict(i, m):
 
 def make_predictions(users2movie_ratings, movies_info):
     print('\nIniciamos las predicciones con User Based Collaborative Filtering...')
-    all_movies_ids = set(movies_info.get_all_id_movies())
+    all_movies_ids = set(movies_info.get_all_movie_ids())
     users2predict_movie_ratings = Users()
 
     log = logger.logger_class('PREDICCIÓN')
@@ -235,7 +235,7 @@ def delete_all_newcomers(users2movie_ratings, movies_info):
     newcomers = movies_info.get_all_newcomers()
     count = 0
     for i, newcomer in enumerate(newcomers):
-        count += users2movie_ratings.delete_movie(newcomer.id_movie)
+        count += users2movie_ratings.delete_movie(newcomer.movie_id)
         log.percentage(i, len(newcomers))
     log.success(f'Se eliminaron {count} calificaciones por ser de newcomers')
     return len(newcomers)

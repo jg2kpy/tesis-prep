@@ -61,21 +61,21 @@ class Users():
                 return [(movie, rating) for movie, rating in zip(user.movies, user.ratings)]
         return None
 
-    def get_ratings_by_id_movie(self, id_movie):
+    def get_ratings_by_movie_id(self, movie_id):
         ratings = []
         for user in self.users:
             for movie, rating in zip(user.movies, user.ratings):
-                if movie == id_movie:
+                if movie == movie_id:
                     ratings.append(rating)
         return ratings
 
     def set_users(self, new_users):
         self.users = new_users
 
-    def delete_movie(self, id_movie):
+    def delete_movie(self, movie_id):
         count = 0
         for user in self.users:
-            if user.delete_movie(id_movie):
+            if user.delete_movie(movie_id):
                 count+=1
                 if user.get_len_movie() == 0:
                     self.users.remove(user)
@@ -109,8 +109,8 @@ class User():
     def get_id(self):
         return self.user_id
 
-    def add_movie_rating(self, new_id_movie, new_rating):
-        self.movies.append(new_id_movie)
+    def add_movie_rating(self, new_movie_id, new_rating):
+        self.movies.append(new_movie_id)
         self.ratings.append(new_rating)
 
     def get_movie_ids(self):
@@ -126,9 +126,9 @@ class User():
     def get_movies_and_ratings(self):
         return list(zip(self.movies, self.ratings))
 
-    def delete_movie(self, id_movie):
-        if id_movie in self.movies:
-            position = self.movies.index(id_movie)
+    def delete_movie(self, movie_id):
+        if movie_id in self.movies:
+            position = self.movies.index(movie_id)
             self.ratings.pop(position)
             self.movies.pop(position)
             return True

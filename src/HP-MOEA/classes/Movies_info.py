@@ -17,17 +17,17 @@ class Movies_info():
     def to_json(self):
         return json.dumps([movie.to_json() for movie in self.movies_info])
 
-    def get_movie_by_id(self, id_movie):
+    def get_movie_by_id(self, movie_id):
         for movie in self.movies_info:
-            if movie.id_movie == id_movie:
+            if movie.movie_id == movie_id:
                 return movie
         return None
 
-    def get_or_create_movie_by_id(self, id_movie):
+    def get_or_create_movie_by_id(self, movie_id):
         for movie in self.movies_info:
-            if movie.id_movie == id_movie:
+            if movie.movie_id == movie_id:
                 return movie
-        movie = Movie_info(id_movie)
+        movie = Movie_info(movie_id)
         return movie
 
     def add_movie(self, new_movie_info):
@@ -36,18 +36,18 @@ class Movies_info():
     def get_len_movies(self):
         return len(self.movies_info)
 
-    def get_all_id_movies(self):
-        return [movie.id_movie for movie in self.movies_info]
+    def get_all_movie_ids(self):
+        return [movie.movie_id for movie in self.movies_info]
 
-    def get_profit_by_id_movie(self, id_movie):
+    def get_profit_by_movie_id(self, movie_id):
         for movie in self.movies_info:
-            if movie.id_movie == id_movie:
+            if movie.movie_id == movie_id:
                 return movie.profit
         return None
 
-    def is_new_comer_by_id_movie(self, id_movie):
+    def is_new_comer_by_movie_id(self, movie_id):
         for movie in self.movies_info:
-            if movie.id_movie == id_movie:
+            if movie.movie_id == movie_id:
                 return movie.is_newcomer
         return None
 
@@ -59,22 +59,22 @@ class Movies_info():
         return all_newcomers
 
     def get_movies_with_profits(self):
-        return {movie.id_movie: movie.profit for movie in self.movies_info if movie.profit is not None}
+        return {movie.movie_id: movie.profit for movie in self.movies_info if movie.profit is not None}
 
 class Movie_info():
-    def __init__(self, id_movie=None, profit=None, is_newcomer=None, fromJson=None):
+    def __init__(self, movie_id=None, profit=None, is_newcomer=None, fromJson=None):
         if fromJson:
-            self.id_movie = fromJson['id_movie']
+            self.movie_id = fromJson['movie_id']
             self.profit = fromJson['profit']
             self.is_newcomer = fromJson['is_newcomer']
         else:
-            self.id_movie = id_movie
+            self.movie_id = movie_id
             self.profit = profit
             self.is_newcomer = is_newcomer
 
     def to_json(self):
         return {
-            'id_movie': self.id_movie,
+            'movie_id': self.movie_id,
             'profit': self.profit,
             'is_newcomer': self.is_newcomer
         }
