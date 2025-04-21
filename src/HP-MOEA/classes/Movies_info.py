@@ -58,6 +58,13 @@ class Movies_info():
                 all_newcomers.append(movie)
         return all_newcomers
 
+    def get_all_newcomers_ids(self):
+        all_newcomers_ids = []
+        for movie in self.movies_info:
+            if movie.is_newcomer:
+                all_newcomers_ids.append(movie.movie_id)
+        return all_newcomers_ids
+
     def get_movies_with_profits(self):
         return {movie.movie_id: movie.profit for movie in self.movies_info if movie.profit is not None}
 
