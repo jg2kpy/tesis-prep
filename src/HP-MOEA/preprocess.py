@@ -19,6 +19,9 @@ def main(dataset_path, output_path = './data', top_usuarios = 10000, new_comer_f
     print("Eliminando la columna 'timestamp'")
     df_og = df_og.drop(columns='timestamp')
 
+    print("Ordenando el dataset por la primera columna...")
+    df_og = df_og.sort_values(by=df_og.columns[0])
+
     print(f"Seleccionando los {top_usuarios} usuarios películas más comunes...")
     user_ids_count = Counter(df_og.userId)
     user_ids = [u for u, c in user_ids_count.most_common(top_usuarios)]
