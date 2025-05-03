@@ -27,7 +27,7 @@ class logger_class():
     def percentage(self, i, N, mensaje = ""):
         current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         elapsed_time = time.time() - self.start_time
-        if i % max(1, N // 20) == 0 or elapsed_time - (self.last_log_time - self.start_time) >= 5:
+        if i % max(1, N // 20) == 0 or elapsed_time - (self.last_log_time - self.start_time) >= 5 or i == N:
             percentage_completed = round((i / N) * 100, 2)
             print(f"{JP_BLUE}[{current_time}] [INFO] [{self.function}] [{elapsed_time:.2f} segundos] {mensaje}{JP_YELLOW}{percentage_completed}%{JP_RESET_ALL}")
             self.last_log_time = time.time()
