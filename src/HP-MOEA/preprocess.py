@@ -46,6 +46,7 @@ def main(dataset_path, output_path = './data', top_usuarios = 10000, new_comer_f
     df_small_len = len(df_small)
     ratings_by_movie = {}
     log_users2movie = logger.logger_class('update_users2movie_ratings')
+    movies_counter = {}
     count = 0
 
     def update_users2movie_ratings(row):
@@ -84,10 +85,11 @@ def main(dataset_path, output_path = './data', top_usuarios = 10000, new_comer_f
         count+=1
 
         ratings = ratings_by_movie[movie_id]
+        popularity = len(ratings)
         profit = calcular_profit(ratings)
         is_newcomer = True if movie_id in new_comers else False
 
-        movie_info = Movie_info(movie_id, profit, is_newcomer)
+        movie_info = Movie_info(movie_id, profit, is_newcomer, popularity)
         movies_info.add_movie(movie_info)
 
     print("\nEliminando usuarios que solo tienen películas newcomers...")

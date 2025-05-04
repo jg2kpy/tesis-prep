@@ -62,20 +62,30 @@ class Movies_info():
     def get_movies_with_profits(self):
         return {movie.movie_id: movie.profit for movie in self.movies_info if movie.profit is not None}
 
+    def get_movies_popularity(self):
+        return {movie.movie_id: movie.popularity for movie in self.movies_info if movie.popularity is not None}
+
+    def get_movies_id_sort_by_popularity(self):
+        return [movie.movie_id for movie in sorted(self.movies_info, key=lambda x: x.popularity, reverse=True)]
+
+
 class Movie_info():
-    def __init__(self, movie_id=None, profit=None, is_newcomer=None, fromJson=None):
+    def __init__(self, movie_id=None, profit=None, is_newcomer=None, popularity = None, fromJson=None):
         if fromJson:
             self.movie_id = fromJson['movie_id']
             self.profit = fromJson['profit']
             self.is_newcomer = fromJson['is_newcomer']
+            self.popularity = fromJson.get('popularity', 0)
         else:
             self.movie_id = movie_id
             self.profit = profit
             self.is_newcomer = is_newcomer
+            self.popularity = popularity
 
     def to_json(self):
         return {
             'movie_id': self.movie_id,
             'profit': self.profit,
-            'is_newcomer': self.is_newcomer
+            'is_newcomer': self.is_newcomer,
+            'popularity': self.popularity
         }
