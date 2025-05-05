@@ -15,7 +15,7 @@ Para la realización de mi TFG, debo profundizar en los siguientes temas:
 
 Actualmente, el tema propuesto para mi TFG es:
 
-> **"Análisis y comparación cuantitativa de diversos operadores genéticos aplicados en un sistema de recomendación implementado con algoritmos evolutivos multiobjetivos."**
+> **"DESARROLLO Y EVALUACIÓN DE UN SISTEMA DE RECOMENDACIÓN HÍBRIDO BASADO EN FILTRADO COLABORATIVO Y ALGORITMOS GENÉTICOS DE OPTIMIZACIÓN MULTIOBJETIVO"**
 
 Este espacio se utilizará para documentar mis avances y aprendizajes en relación con este tema.
 
